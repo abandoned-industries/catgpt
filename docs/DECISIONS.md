@@ -18,3 +18,10 @@
   sanctioned fallback) instead of injecting `-webkit-app-region: drag` into
   chatgpt.com's DOM — the remote DOM is unstable and injection risks breaking site
   interactions. Revisit during Phase 3 polish if the strip feels heavy.
+- `module: ESNext` + `moduleResolution: bundler` in tsconfig — required by the
+  ESM-only `electron-store` declarations; vite bundles the main process either way.
+- OAuth child-window hosts: accounts.google.com, accounts.youtube.com (Google SSO
+  hop), appleid.apple.com, idmsa.apple.com. Everything else → system browser.
+- Saved window position is dropped (size kept) when it no longer intersects any
+  display, so a detached external monitor can't strand the window off-screen.
+- In fullscreen the 28px drag strip collapses (view takes the full content area).

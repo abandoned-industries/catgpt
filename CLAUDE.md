@@ -20,6 +20,15 @@ Work proceeds in the brief's phases. Each phase ends at a human verification gat
 STOP after completing a phase and wait for Kazys to run the gate checklist. Never
 begin the next phase without explicit approval.
 
+## Dev notes (hard-won, do not rediscover)
+
+- The Forge vite plugin names the main bundle after the entry file:
+  `src/main/index.ts` → `.vite/build/index.js`. package.json `"main"` must match,
+  or Electron dies with "Unable to find Electron app".
+- `electron-forge start` tears down (exit 0, before launching Electron) when stdin
+  hits EOF — background/scripted launches must hold stdin open, e.g.
+  `tail -f /dev/null | npm start`. Interactive terminal runs are unaffected.
+
 ## Security posture
 
 `contextIsolation: true`, `sandbox: true`, `nodeIntegration: false` on all web
