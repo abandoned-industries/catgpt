@@ -1,5 +1,19 @@
 # Decisions log
 
+## Phase 2 (2026-07-10)
+
+- **Gate 1 passed** (owner-verified): Google OAuth via non-passkey factor, session
+  persistence across relaunches, external links → default browser.
+- New Chat (⌘N) = deterministic `loadURL('https://chatgpt.com/')`, NOT synthesized
+  site shortcuts — the site's shortcut map changes without notice.
+- Camera stays denied: `media` allowed only when the request is audio-only, and
+  only for https://chatgpt.com. Notifications allowed for the same single origin.
+- **Dock badge deviation**: Electron has no main-process event for page-generated
+  HTML5 notifications, so badge-SETTING is unimplemented (documented in index.ts);
+  badge clearing on focus works. Revisit only if Electron adds such an event.
+- Downloads: no save dialog (straight to ~/Downloads with unique naming), dock
+  progress aggregates simultaneous downloads, Finder reveal on completion per brief.
+
 ## Project start (2026-07-10)
 
 - App name: **CatGPT** (owner decision; brief's working name "Interlocutor" dropped).
