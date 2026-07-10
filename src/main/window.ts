@@ -1,4 +1,9 @@
-import { BrowserWindow, WebContentsView, screen } from 'electron';
+import {
+  BrowserWindow,
+  WebContentsView,
+  powerSaveBlocker,
+  screen,
+} from 'electron';
 import path from 'node:path';
 
 import { CHATGPT_PARTITION } from './session';
@@ -99,6 +104,30 @@ export const createMainWindow = (): MainWindowHandle => {
   window.on('resize', updateViewBounds);
   window.on('enter-full-screen', updateViewBounds);
   window.on('leave-full-screen', updateViewBounds);
+
+  // Keep macOS from napping the app while it is producing audio (voice mode,
+  // long spoken responses) — engaged only while audible, released on silence.
+  let audioPowerBlocker: number | undefined;
+
+  const releaseAudioPowerBlocker = (): void => {
+    if (audioPowerBlocker !== undefined) {
+      powerSaveBlocker.stop(audioPowerBlocker);
+      audioPowerBlocker = undefined;
+    }
+  };
+
+  view.webContents.on('audio-state-changed', ({ audible }) => {
+    if (audible && audioPowerBlocker === undefined) {
+      audioPowerBlocker = powerSaveBlocker.start('prevent-app-suspension');
+      return;
+    }
+
+    if (!audible) {
+      releaseAudioPowerBlocker();
+    }
+  });
+
+  window.on('closed', releaseAudioPowerBlocker);
 
   const restoreZoomLevel = (): void => {
     view.webContents.setZoomLevel(getZoomLevel());
