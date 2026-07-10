@@ -1,6 +1,26 @@
-import { app, type Session } from 'electron';
+import { app, systemPreferences, type Session } from 'electron';
 
 const CHATGPT_ORIGIN = 'https://chatgpt.com';
+
+// Electron-level permission is not enough for audio capture: macOS TCC must
+// also grant the microphone to this app. 'not-determined' → trigger the system
+// prompt; 'denied'/'restricted' → capture yields silence, so refuse and log.
+const ensureMicrophoneAccess = async (): Promise<boolean> => {
+  const status = systemPreferences.getMediaAccessStatus('microphone');
+
+  if (status === 'granted') {
+    return true;
+  }
+
+  if (status === 'not-determined') {
+    return systemPreferences.askForMediaAccess('microphone');
+  }
+
+  console.warn(
+    `[permissions] macOS microphone access is "${status}" — enable this app in System Settings > Privacy & Security > Microphone`,
+  );
+  return false;
+};
 
 const normalizeOrigin = (value: string): string => {
   try {
@@ -40,9 +60,21 @@ export const configurePermissions = (appSession: Session): void => {
 
       if (!allowed) {
         logDenial(permission, origin);
+        callback(false);
+        return;
       }
 
-      callback(allowed);
+      if (permission === 'media') {
+        void ensureMicrophoneAccess().then((microphoneGranted) => {
+          if (!microphoneGranted) {
+            logDenial('media (macOS microphone)', origin);
+          }
+          callback(microphoneGranted);
+        });
+        return;
+      }
+
+      callback(true);
     },
   );
 
@@ -51,10 +83,13 @@ export const configurePermissions = (appSession: Session): void => {
       const origin = normalizeOrigin(
         details.securityOrigin ?? requestingOrigin,
       );
+      // Checks (unlike requests) also arrive for device enumeration with no
+      // mediaType; denying those hides input devices from the page, so only
+      // an explicit 'video' check is refused.
       const allowed =
         isAllowedOrigin(origin) &&
         (permission === 'notifications' ||
-          (permission === 'media' && details.mediaType === 'audio'));
+          (permission === 'media' && details.mediaType !== 'video'));
 
       if (!allowed) {
         logDenial(permission, origin);
