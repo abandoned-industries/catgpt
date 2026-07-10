@@ -1,0 +1,14 @@
+# Dependencies
+node_modules/
+
+# Build output — out/ is the only canonical build path (see CLAUDE.md)
+out/
+.vite/
+*.tsbuildinfo
+
+# Local noise
+.DS_Store
+*.log
+.eslintcache
+.env
+.claude/settings.local.json
