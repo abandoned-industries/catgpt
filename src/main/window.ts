@@ -23,6 +23,8 @@ export interface MainWindowHandle {
   persistState: () => void;
 }
 
+export type MainWindowResolver = () => MainWindowHandle | undefined;
+
 const positionOnScreen = (bounds: WindowBounds): boolean =>
   screen.getAllDisplays().some((display) => {
     const area = display.workArea;
@@ -77,6 +79,7 @@ export const createMainWindow = (): MainWindowHandle => {
       sandbox: true,
       nodeIntegration: false,
       backgroundThrottling: false,
+      spellcheck: true,
     },
   });
   window.contentView.addChildView(view);

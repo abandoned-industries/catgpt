@@ -1,5 +1,8 @@
 import { app, type BrowserWindow } from 'electron';
 
+import { attachDownloadHandling } from './downloads';
+import { registerGlobalHotkey, unregisterGlobalHotkey } from './hotkey';
+import { buildApplicationMenu } from './menu';
 import { attachNavigationPolicy } from './navigation';
 import { configurePermissions } from './permissions';
 import { configureAppSession } from './session';
@@ -7,6 +10,9 @@ import { createMainWindow, type MainWindowHandle } from './window';
 
 let mainWindow: MainWindowHandle | undefined;
 let quitting = false;
+let registeredHotkey: string | undefined;
+
+const resolveMainWindow = (): MainWindowHandle | undefined => mainWindow;
 
 const showMainWindow = (window: BrowserWindow): void => {
   if (window.isMinimized()) {
@@ -34,6 +40,12 @@ const createAndTrackMainWindow = (): MainWindowHandle => {
     }
   });
 
+  handle.window.on('focus', () => {
+    // HTML5 notifications expose no main-process event from which to set a badge.
+    // Clearing is reliable; badge-setting remains intentionally unimplemented.
+    app.dock?.setBadge('');
+  });
+
   return handle;
 };
 
@@ -53,6 +65,13 @@ if (!gotSingleInstanceLock) {
     mainWindow?.persistState();
   });
 
+  app.on('will-quit', () => {
+    if (registeredHotkey) {
+      unregisterGlobalHotkey(registeredHotkey);
+      registeredHotkey = undefined;
+    }
+  });
+
   app.on('web-contents-created', (_event, contents) => {
     attachNavigationPolicy(contents);
     contents.on('will-attach-webview', (event) => event.preventDefault());
@@ -61,6 +80,9 @@ if (!gotSingleInstanceLock) {
   app.on('ready', () => {
     const appSession = configureAppSession();
     configurePermissions(appSession);
+    attachDownloadHandling(appSession, resolveMainWindow);
+    buildApplicationMenu(resolveMainWindow);
+    registeredHotkey = registerGlobalHotkey(resolveMainWindow);
     createAndTrackMainWindow();
   });
 

@@ -11,6 +11,10 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: './assets/CatGPT',
+    extendInfo: {
+      NSMicrophoneUsageDescription:
+        'CatGPT needs the microphone for ChatGPT voice mode.',
+    },
   },
   rebuildConfig: {},
   makers: [
