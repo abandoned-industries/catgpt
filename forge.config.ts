@@ -11,9 +11,21 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: './assets/CatGPT',
+    appBundleId: 'net.varnelis.catgpt',
     extendInfo: {
       NSMicrophoneUsageDescription:
         'CatGPT needs the microphone for ChatGPT voice mode.',
+    },
+    // Real signing pulled forward from Phase 4: macOS TCC refuses to attribute
+    // the microphone permission to an ad-hoc, teamless binary (the packager's
+    // fallback signature even kept the com.github.Electron identifier), so the
+    // system prompt never appears. Signing requires hardened-runtime
+    // entitlements for Electron's JIT plus audio-input for voice mode.
+    osxSign: {
+      identity: 'Developer ID Application: Kazys Varnelis (PHCL25Z99X)',
+      optionsForFile: () => ({
+        entitlements: 'packaging/entitlements.plist',
+      }),
     },
   },
   rebuildConfig: {},
