@@ -32,6 +32,10 @@
 - **Node 26 packaging bug**: `@electron/packager`'s `extract-zip` (yauzl@2) silently
   extracts one file and exits 0 (forge#4277). Fix: npm override
   `extract-zip → npm:@electron-internal/extract-zip@1.0.3`. Remove at Forge ≥8.
+- **Icon** (pulled forward from Phase 3, owner request): owner's ChatGPT-generated
+  waving-cat concept (assets/icon-concept.png) vectorized by Codex into
+  assets/icon.svg (labeled groups per feature; ochre tile). Regenerate previews and
+  assets/CatGPT.icns with scripts/render-icon.sh. Wired via packagerConfig.icon.
 - **Packaged app ships from Phase 1** (owner request): `npm run package` →
   `out/CatGPT-darwin-arm64/CatGPT.app`, root symlink `CatGPT.app` for Finder launch.
   Unsigned until Phase 4 (fine locally — no quarantine on locally built bundles).
