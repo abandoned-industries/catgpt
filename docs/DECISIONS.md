@@ -25,3 +25,14 @@
 - Saved window position is dropped (size kept) when it no longer intersects any
   display, so a detached external monitor can't strand the window off-screen.
 - In fullscreen the 28px drag strip collapses (view takes the full content area).
+- **Google login: passkeys cannot complete inside the app** (Electron has no macOS
+  platform-authenticator bridge). Documented fallback per brief pitfall 2b: on the
+  passkey screen choose "Try another way" → phone prompt / authenticator / SMS.
+  Verified working 2026-07-10; session persists in the partition afterward.
+- **Node 26 packaging bug**: `@electron/packager`'s `extract-zip` (yauzl@2) silently
+  extracts one file and exits 0 (forge#4277). Fix: npm override
+  `extract-zip → npm:@electron-internal/extract-zip@1.0.3`. Remove at Forge ≥8.
+- **Packaged app ships from Phase 1** (owner request): `npm run package` →
+  `out/CatGPT-darwin-arm64/CatGPT.app`, root symlink `CatGPT.app` for Finder launch.
+  Unsigned until Phase 4 (fine locally — no quarantine on locally built bundles).
+  Bundle id left at packager default until Phase 4 (`appBundleId` TODO).

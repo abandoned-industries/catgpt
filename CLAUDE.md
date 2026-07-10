@@ -10,9 +10,12 @@ scope, phases, pitfalls, and the security posture. Decisions log: `docs/DECISION
   directories, ever; `out/` is the only gitignored build path.
 - Dev run: `npm start` (Forge + Vite). Package: `npm run make` → artifacts in
   `out/make/`, app bundle under `out/CatGPT-darwin-arm64/`.
-- From Phase 4 on, the repo root keeps a `CatGPT.app` symlink pointing at the
-  packaged app in `out/` — if the packaged path changes, update the symlink in the
-  same commit.
+- The repo root keeps a `CatGPT.app` symlink → `out/CatGPT-darwin-arm64/CatGPT.app`
+  (Finder-launchable, per the ~/Developer symlink rule). `npm run package` refreshes
+  the product; the symlink path is stable. If the packaged path ever changes, update
+  the symlink in the same commit.
+- Dev instance and packaged app share userData (login persists across both) and a
+  single-instance lock — never run them simultaneously; the second exits at once.
 
 ## Phase gates (hard rule)
 
@@ -28,6 +31,10 @@ begin the next phase without explicit approval.
 - `electron-forge start` tears down (exit 0, before launching Electron) when stdin
   hits EOF — background/scripted launches must hold stdin open, e.g.
   `tail -f /dev/null | npm start`. Interactive terminal runs are unaffected.
+- Node ≥24.16/26: `extract-zip → yauzl@2` silently truncates the Electron zip and
+  packaging exits 0 with no `out/` (forge#4277, electron#51619). Fixed by the
+  package.json `overrides` pin to `@electron-internal/extract-zip` — keep it until
+  the project moves to Forge ≥8 stable, then drop it.
 
 ## Security posture
 

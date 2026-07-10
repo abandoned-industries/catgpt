@@ -1,0 +1,1 @@
+out/CatGPT-darwin-arm64/CatGPT.app

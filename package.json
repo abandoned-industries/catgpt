@@ -38,5 +38,8 @@
   },
   "dependencies": {
     "electron-store": "^11.0.2"
+  },
+  "overrides": {
+    "extract-zip": "npm:@electron-internal/extract-zip@1.0.3"
   }
 }
