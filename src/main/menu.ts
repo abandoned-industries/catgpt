@@ -1,4 +1,4 @@
-import { Menu, type MenuItemConstructorOptions } from 'electron';
+import { Menu, app, type MenuItemConstructorOptions } from 'electron';
 
 import { setZoomLevel } from './state';
 import type { MainWindowHandle, MainWindowResolver } from './window';
@@ -81,7 +81,12 @@ export const buildApplicationMenu = (
           label: 'Close Window',
           accelerator: 'Command+W',
           click: () => {
-            withMainWindow(resolveMainWindow, ({ window }) => window.hide());
+            withMainWindow(resolveMainWindow, ({ window }) => {
+              window.hide();
+              // Same reasoning as the close-button path: yield activation so
+              // the next dock click fires 'activate' and can restore us.
+              app.hide();
+            });
           },
         },
       ],

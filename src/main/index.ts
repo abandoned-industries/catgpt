@@ -1,4 +1,4 @@
-import { app, type BrowserWindow } from 'electron';
+import { Menu, app, type BrowserWindow } from 'electron';
 
 import { attachDownloadHandling } from './downloads';
 import { registerGlobalHotkey, unregisterGlobalHotkey } from './hotkey';
@@ -31,6 +31,10 @@ const createAndTrackMainWindow = (): MainWindowHandle => {
     if (!quitting) {
       event.preventDefault();
       handle.window.hide();
+      // Yield activation: otherwise CatGPT stays the active app with no
+      // window, and macOS never fires 'activate' on dock clicks — the
+      // window becomes unreachable.
+      app.hide();
     }
   });
 
@@ -84,6 +88,29 @@ if (!gotSingleInstanceLock) {
     buildApplicationMenu(resolveMainWindow);
     registeredHotkey = registerGlobalHotkey(resolveMainWindow);
     createAndTrackMainWindow();
+
+    // Dock menu as a recovery path that never depends on event timing.
+    app.dock?.setMenu(
+      Menu.buildFromTemplate([
+        {
+          label: 'Show CatGPT',
+          click: () => {
+            if (mainWindow && !mainWindow.window.isDestroyed()) {
+              showMainWindow(mainWindow.window);
+            }
+          },
+        },
+        {
+          label: 'New Chat',
+          click: () => {
+            if (mainWindow && !mainWindow.window.isDestroyed()) {
+              showMainWindow(mainWindow.window);
+              void mainWindow.view.webContents.loadURL('https://chatgpt.com/');
+            }
+          },
+        },
+      ]),
+    );
   });
 
   app.on('activate', () => {

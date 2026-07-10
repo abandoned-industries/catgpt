@@ -67,12 +67,21 @@ const store = new Store<StateSchema>({
   defaults: {
     zoomLevel: 0,
     prefs: {
-      globalHotkey: 'Alt+Space',
+      globalHotkey: 'Control+Command+G',
       cssTweaks: {},
       updateNag: { enabled: true },
     },
   },
 });
+
+// Migrate the retired Alt+Space default — it collides with the owner's
+// Spotlight binding, so it was never reachable and never a deliberate choice.
+if (store.get('prefs').globalHotkey === 'Alt+Space') {
+  store.set('prefs', {
+    ...store.get('prefs'),
+    globalHotkey: 'Control+Command+G',
+  });
+}
 
 export const getWindowBounds = (): WindowBounds | undefined =>
   store.get('windowBounds');
