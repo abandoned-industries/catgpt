@@ -1,3 +1,6 @@
+import { execFileSync } from 'node:child_process';
+import path from 'node:path';
+
 import type { ForgeConfig } from '@electron-forge/shared-types';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { MakerZIP } from '@electron-forge/maker-zip';
@@ -6,6 +9,9 @@ import { MakerRpm } from '@electron-forge/maker-rpm';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+
+const SIGNING_IDENTITY =
+  'Developer ID Application: Kazys Varnelis (PHCL25Z99X)';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -16,16 +22,37 @@ const config: ForgeConfig = {
       NSMicrophoneUsageDescription:
         'CatGPT needs the microphone for ChatGPT voice mode.',
     },
-    // Real signing pulled forward from Phase 4: macOS TCC refuses to attribute
-    // the microphone permission to an ad-hoc, teamless binary (the packager's
-    // fallback signature even kept the com.github.Electron identifier), so the
-    // system prompt never appears. Signing requires hardened-runtime
-    // entitlements for Electron's JIT plus audio-input for voice mode.
-    osxSign: {
-      identity: 'Developer ID Application: Kazys Varnelis (PHCL25Z99X)',
-      optionsForFile: () => ({
-        entitlements: 'packaging/entitlements.plist',
-      }),
+  },
+  // Signing pulled forward from Phase 4: macOS TCC refuses to attribute the
+  // microphone permission to an ad-hoc, teamless binary (the packager's fallback
+  // even keeps the com.github.Electron identifier), so voice mode's system prompt
+  // never fires. `packagerConfig.osxSign` was silently ignored by Forge here, so
+  // we sign in a postPackage hook instead — deterministic and always applied.
+  // Signed but NOT notarized (owner decision): locally-built bundles carry no
+  // quarantine flag, so Gatekeeper launches them despite `spctl` assessment.
+  hooks: {
+    postPackage: async (_forgeConfig, { platform, outputPaths }) => {
+      if (platform !== 'darwin') {
+        return;
+      }
+
+      const appPath = path.join(outputPaths[0], 'CatGPT.app');
+      const signer = path.resolve(
+        process.cwd(),
+        'node_modules/.bin/electron-osx-sign',
+      );
+
+      execFileSync(
+        signer,
+        [
+          appPath,
+          `--identity=${SIGNING_IDENTITY}`,
+          '--entitlements=packaging/entitlements.plist',
+          '--hardened-runtime',
+          '--type=distribution',
+        ],
+        { stdio: 'inherit' },
+      );
     },
   },
   rebuildConfig: {},
