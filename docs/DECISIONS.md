@@ -2,6 +2,16 @@
 
 ## Phase 2 (2026-07-10)
 
+- **Icon final: raster portrait, treatment A** (owner-picked). Owner generated a
+  painted portrait in ChatGPT (assets/icon-portrait-source.jpg, background baked
+  in); Vision subject-lift (scripts/subject-lift.swift) cuts real alpha; treatment
+  A composites it floating on the ochre tile. Regenerate with
+  scripts/build-portrait-icon.sh. The vector icon (assets/icon.svg +
+  scripts/render-icon.sh) is RETIRED but kept for history/tweaks.
+- **Voice-mode audio**: stutter + slight self-hearing judged within normal
+  variance after signing fix (not AirPods). Baseline test if it recurs: same
+  session in Safari; only chase shell-side audio flags if CatGPT is clearly worse.
+
 - **Gate 1 passed** (owner-verified): Google OAuth via non-passkey factor, session
   persistence across relaunches, external links → default browser.
 - New Chat (⌘N) = deterministic `loadURL('https://chatgpt.com/')`, NOT synthesized
