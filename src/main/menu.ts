@@ -1,5 +1,12 @@
-import { Menu, app, type MenuItemConstructorOptions } from 'electron';
+import {
+  Menu,
+  app,
+  dialog,
+  session,
+  type MenuItemConstructorOptions,
+} from 'electron';
 
+import { CHATGPT_PARTITION } from './session';
 import { setZoomLevel } from './state';
 import type { MainWindowHandle, MainWindowResolver } from './window';
 
@@ -54,6 +61,37 @@ export const buildApplicationMenu = (
       label: 'CatGPT',
       submenu: [
         { label: 'About CatGPT', role: 'about' },
+        {
+          label: 'Clear Login Data…',
+          click: async () => {
+            const handle = resolveUsableHandle(resolveMainWindow);
+
+            if (!handle) {
+              return;
+            }
+
+            const { response } = await dialog.showMessageBox(handle.window, {
+              type: 'warning',
+              message: 'Log out and erase all CatGPT login data on this Mac?',
+              detail:
+                'This erases cookies and other login data only for this app.',
+              buttons: ['Erase & Log Out', 'Cancel'],
+              defaultId: 1,
+              cancelId: 1,
+            });
+
+            if (response !== 0) {
+              return;
+            }
+
+            await session.fromPartition(CHATGPT_PARTITION).clearStorageData();
+
+            const currentHandle = resolveUsableHandle(resolveMainWindow);
+            if (currentHandle) {
+              await currentHandle.view.webContents.loadURL(CHATGPT_URL);
+            }
+          },
+        },
         { type: 'separator' },
         { role: 'services', submenu: [] },
         { type: 'separator' },

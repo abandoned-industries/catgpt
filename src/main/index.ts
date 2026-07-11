@@ -1,10 +1,10 @@
-import { Menu, app, type BrowserWindow } from 'electron';
+import { Menu, app, type BrowserWindow, type WebContents } from 'electron';
 
 import { configureAboutPanel } from './about';
 import { attachDownloadHandling } from './downloads';
 import { registerGlobalHotkey, unregisterGlobalHotkey } from './hotkey';
 import { buildApplicationMenu } from './menu';
-import { attachNavigationPolicy } from './navigation';
+import { attachNavigationPolicy, OAUTH_POPUP_HOSTS } from './navigation';
 import { configurePermissions } from './permissions';
 import { configureAppSession } from './session';
 import { showSplashIfNeeded } from './splash';
@@ -13,6 +13,64 @@ import { createMainWindow, type MainWindowHandle } from './window';
 let mainWindow: MainWindowHandle | undefined;
 let quitting = false;
 let registeredHotkey: string | undefined;
+const trackedOAuthPopups = new Set<number>();
+
+const CHATGPT_URL = 'https://chatgpt.com/';
+const OAUTH_RECOVERY_DELAY_MS = 1_200;
+
+const isOAuthPopupUrl = (rawUrl: string): boolean => {
+  try {
+    return OAUTH_POPUP_HOSTS.includes(
+      new URL(rawUrl).hostname as (typeof OAUTH_POPUP_HOSTS)[number],
+    );
+  } catch {
+    return false;
+  }
+};
+
+const isAuthLimboUrl = (rawUrl: string): boolean => {
+  if (!rawUrl || rawUrl === 'about:blank') {
+    return true;
+  }
+
+  try {
+    const url = new URL(rawUrl);
+    return (
+      url.hostname === 'auth.openai.com' ||
+      (url.hostname === 'chatgpt.com' && url.pathname.startsWith('/auth'))
+    );
+  } catch {
+    return false;
+  }
+};
+
+const trackOAuthPopup = (contents: WebContents, initialUrl: string): void => {
+  if (!isOAuthPopupUrl(initialUrl) || trackedOAuthPopups.has(contents.id)) {
+    return;
+  }
+
+  trackedOAuthPopups.add(contents.id);
+  contents.once('destroyed', () => {
+    trackedOAuthPopups.delete(contents.id);
+    setTimeout(() => {
+      const handle = resolveMainWindow();
+
+      if (
+        !handle ||
+        handle.window.isDestroyed() ||
+        handle.view.webContents.isDestroyed() ||
+        !isAuthLimboUrl(handle.view.webContents.getURL())
+      ) {
+        return;
+      }
+
+      if (!app.isPackaged) {
+        console.log('[oauth] recovered blank post-login state');
+      }
+      void handle.view.webContents.loadURL(CHATGPT_URL);
+    }, OAUTH_RECOVERY_DELAY_MS);
+  });
+};
 
 const resolveMainWindow = (): MainWindowHandle | undefined => mainWindow;
 
@@ -28,6 +86,10 @@ const showMainWindow = (window: BrowserWindow): void => {
 const createAndTrackMainWindow = (): MainWindowHandle => {
   const handle = createMainWindow();
   mainWindow = handle;
+
+  handle.view.webContents.on('did-create-window', (childWindow, details) => {
+    trackOAuthPopup(childWindow.webContents, details.url);
+  });
 
   handle.window.on('close', (event) => {
     if (!quitting) {
