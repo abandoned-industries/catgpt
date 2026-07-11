@@ -1,12 +1,16 @@
-# CatGPT 🐈‍⬛
+# CatGPT 🐈‍⬛ — unofficial ChatGPT desktop wrapper
+
+> **Unofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed
+> by, or sponsored by OpenAI.** "ChatGPT" is a trademark of OpenAI. CatGPT
+> simply displays chatgpt.com in an embedded browser view under your own
+> login — it does not modify, intercept, or automate the service.
 
 A personal-use macOS desktop app wrapping **chatgpt.com** in a native-feeling
 Electron shell — persistent login, real menus, a global summon key, native
-notifications, downloads handling, and **voice mode** (which the web-wrapped
-alternatives and "ChatGPT Classic" era apps don't all give you).
+notifications, downloads handling, and **voice mode**. Named for and starring
+Ajman, the resident cat god. MIT licensed.
 
-Built for macOS 14+ on Apple Silicon. Not affiliated with OpenAI; no OpenAI
-branding; it simply displays chatgpt.com under your own login.
+Built for macOS 14+ on Apple Silicon.
 
 ## Install (from a release)
 
