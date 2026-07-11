@@ -59,7 +59,7 @@ echo "==> Building README.pdf"
 mkdir -p "$RELDIR"
 PDF="$RELDIR/CatGPT-README.pdf"
 pandoc README.md -f gfm -s -o "$PDF" --pdf-engine=weasyprint \
-  --metadata title="CatGPT" --metadata pagetitle="CatGPT"
+  --metadata pagetitle="CatGPT"
 
 echo "==> Building release artifacts"
 ZIP="$RELDIR/CatGPT-$VERSION-arm64.zip"
