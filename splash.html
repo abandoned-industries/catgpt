@@ -14,26 +14,33 @@
 
       <p class="disclaimer">
         Unofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed
-        by, or sponsored by OpenAI.
+        by, or sponsored by OpenAI. CatGPT itself collects <strong>no data</strong> —
+        no analytics, no telemetry; everything you type goes directly to
+        ChatGPT.com.
       </p>
 
       <section aria-labelledby="before-login-heading">
         <h2 id="before-login-heading">Before you log in</h2>
         <ol>
-          <li>Choose <q>Continue with Google</q>.</li>
+          <li>Choose <q>Continue with Google</q> — the only tested sign-in path.</li>
           <li>
-            If Google shows <q>Use your passkey</q>, do <strong>NOT</strong> press
-            Continue — passkeys cannot work inside this app.
+            Expect a passkey screen <strong>twice</strong>: first Google's
+            (<q>Use your passkey</q>), then — after Google succeeds — OpenAI's own
+            (<q>Verify your identity</q>). Passkeys cannot work inside this app;
+            never pick them.
           </li>
           <li>
-            Click <q>Try another way</q> and use a phone prompt, authenticator
-            code, or SMS instead.
+            Both times take the alternative: <q>Try another way</q> (Google — e.g.
+            text message, or tap <em>Yes</em> on your phone) and
+            <q>Try another method</q> (OpenAI — e.g. push notification to your
+            ChatGPT mobile app, then approve there).
           </li>
           <li>This is one-time; your session persists across restarts.</li>
         </ol>
       </section>
 
       <button type="button" onclick="window.close()">Got it</button>
+      <p class="footer">An Abandoned Industries project</p>
     </main>
   </body>
 </html>

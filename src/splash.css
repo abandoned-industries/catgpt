@@ -101,3 +101,9 @@ button:focus-visible {
   outline-offset: 2px;
 }
 
+
+.footer {
+  margin: 14px 0 0;
+  color: #9b9b9b;
+  font-size: 11.5px;
+}

@@ -83,16 +83,19 @@ if [[ "$SKIP_NOTARIZE" != "--skip-notarize" ]]; then
   xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait
   xcrun stapler staple "$DMG"
 fi
+SUMS="$RELDIR/SHA256SUMS"
+(cd "$RELDIR" && shasum -a 256 "$(basename "$DMG")" "$(basename "$ZIP")" > SHA256SUMS)
 echo "    $ZIP"
 echo "    $DMG"
 echo "    $PDF"
+echo "    $SUMS"
 
 if gh release view "v$VERSION" >/dev/null 2>&1; then
   echo "==> Release v$VERSION exists — refreshing assets in place"
-  gh release upload "v$VERSION" "$DMG" "$ZIP" "$PDF" --clobber
+  gh release upload "v$VERSION" "$DMG" "$ZIP" "$PDF" "$SUMS" --clobber
 else
   echo "==> Creating GitHub release v$VERSION"
-  gh release create "v$VERSION" "$DMG" "$ZIP" "$PDF" \
+  gh release create "v$VERSION" "$DMG" "$ZIP" "$PDF" "$SUMS" \
     --title "CatGPT $VERSION" \
     --notes "Signed and notarized macOS build (Apple Silicon), app and DMG both stapled. Open the DMG and drag CatGPT onto the Applications alias. See the bundled README (also attached as PDF) for the login guide — passkeys don't work in-app; use \"Try another way\"."
 fi

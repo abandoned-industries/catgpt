@@ -12,7 +12,7 @@ export const configureAboutPanel = (): void => {
     applicationVersion: app.getVersion(),
     iconPath: getAboutIconPath(),
     credits:
-      'For Ajman, the cat god. 🐈‍⬛\nUnofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed by, or sponsored by OpenAI.',
-    copyright: '© 2026 Kazys Varnelis · MIT License',
+      'For Ajman, the cat god. 🐈‍⬛\nUnofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed by, or sponsored by OpenAI.\nCatGPT collects no data — everything goes directly to ChatGPT.com.',
+    copyright: '© 2026 Abandoned Industries · MIT License',
   });
 };

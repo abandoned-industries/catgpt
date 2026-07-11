@@ -3,12 +3,14 @@
 > **Unofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed
 > by, or sponsored by OpenAI.** "ChatGPT" is a trademark of OpenAI. CatGPT
 > simply displays chatgpt.com in an embedded browser view under your own
-> login — it does not modify, intercept, or automate the service.
+> login — it does not modify, intercept, or automate the service. **CatGPT
+> itself collects no data whatsoever** — no analytics, no telemetry, no
+> servers of ours; everything you type goes directly to ChatGPT.com.
 
 A personal-use macOS desktop app wrapping **chatgpt.com** in a native-feeling
 Electron shell — persistent login, real menus, a global summon key, native
 notifications, downloads handling, and **voice mode**. Named for and starring
-Ajman, the resident cat god. MIT licensed.
+Ajman, the resident cat god. An Abandoned Industries project. MIT licensed.
 
 Built for macOS 14+ on Apple Silicon.
 
@@ -27,22 +29,25 @@ work** (Electron has no bridge to macOS's Touch ID / iCloud Keychain
 authenticator). The fix is one click, but you have to know it's there:
 
 1. Click **Log in** → **Continue with Google** (a Google sign-in window opens
-   inside the app — that's normal).
-2. If Google shows **"Use your passkey to confirm it's really you"** — do
-   **NOT** press Continue. It will spin forever; there is no passkey device
-   inside an Electron shell.
-3. Click **"Try another way"** instead, then pick any of:
-   - **"Get a prompt on your phone"** — easiest; tap *Yes* on your iPhone
-     (any phone signed into your Google account, e.g. via the Gmail app),
-   - an **authenticator app code**,
-   - an **SMS code**.
-4. You don't need a Google password for any of those — passwordless accounts
-   work fine via the phone prompt.
+   inside the app — that's normal). **Only Google sign-in has been tested
+   end-to-end.**
+2. Expect the passkey wall **twice** in one login:
+   - First **Google's** — "Use your passkey to confirm it's really you"
+     (appears even with "Don't ask again on this device" previously checked).
+   - Then, *after Google succeeds*, **OpenAI's own** — "Verify your identity."
+   Passkeys cannot work inside any Electron app. **Never pick the passkey
+   option; take any other offered method.**
+3. Google's fallback: click **"Try another way"** → e.g. a text message code,
+   "Tap Yes on your phone," an authenticator code.
+4. OpenAI's fallback: click **"Try another method"** → e.g. **push
+   notification** — an "Approve sign-in" prompt appears in the ChatGPT app on
+   your phone/tablet; approve it there. Text and email codes also offered.
 
 This is **one-time**: the session lives in a persistent partition and
-survives quits, reboots, and app rebuilds. Email/password and emailed
-one-time-code login also work normally, as does Apple sign-in (same rule:
-avoid the passkey screen, use the fallback).
+survives quits, reboots, and app rebuilds. (OpenAI may occasionally demand a
+re-verification — after app updates, for instance. Same dance, same rule.) Native email login and Apple
+sign-in are **unverified** — if you use them, the same rule applies: never
+pick the passkey option.
 
 ## Voice mode
 
@@ -106,6 +111,26 @@ Notes:
   `./scripts/build-portrait-icon.sh`.
 - The product brief lives in `chatgpt-electron-agent-brief.md`; every
   non-obvious decision is logged in `docs/DECISIONS.md`.
+
+## Trust & verification
+
+CatGPT is a webview wrapper, and wrappers ask for trust — here is how you
+verify instead:
+
+- **No proxy, no interception**: the app speaks TLS directly to chatgpt.com,
+  certificate-validated by the same Chromium engine Chrome uses. A navigation
+  allowlist in the main process means the embedded view cannot be steered to
+  any other site. No app code runs inside the page.
+- **Read the source**: this repo is the entire app. The only URL ever loaded
+  is `https://chatgpt.com` (see `src/main/window.ts` and
+  `src/main/navigation.ts`).
+- **Verify a release download**:
+
+  ```bash
+  spctl --assess --type open --context context:primary-signature -v CatGPT-*.dmg   # notarized Developer ID
+  codesign -dv --verbose=2 /Applications/CatGPT.app                                 # TeamIdentifier=PHCL25Z99X
+  shasum -a 256 -c SHA256SUMS                                                       # matches the release asset
+  ```
 
 ## Known limitations
 

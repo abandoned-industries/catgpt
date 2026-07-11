@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Kazys Varnelis
+Copyright (c) 2026 Abandoned Industries
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -16,7 +16,8 @@ copies or substantial portions of the Software.
 affiliated with, endorsed by, or sponsored by OpenAI. "ChatGPT" is a
 trademark of OpenAI. This software displays chatgpt.com in an embedded
 browser view under the user's own account and does not modify, intercept,
-or automate the service.
+or automate the service. CatGPT itself
+collects no data whatsoever — no analytics, no telemetry, no servers.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,

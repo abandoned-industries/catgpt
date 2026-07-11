@@ -1,5 +1,14 @@
 # Decisions log
 
+## Trust posture (2026-07-11, owner-approved)
+
+- Audit trail = open source + notarized identity + README "Trust &
+  verification" (verify commands) + SHA256SUMS on releases. A View→"Show
+  Address" read-only domain display is queued for Phase 3. A local navigation
+  log was considered and rejected (conflicts with the collects-nothing story).
+- Login guide documents the double passkey wall (Google's, then OpenAI's
+  post-SSO) from owner field-testing; only Google sign-in is tested.
+
 ## Release v0.1.0 (2026-07-10, owner-directed)
 
 - Phase order amended by owner: release pipeline (Phase 4 scope) built before
