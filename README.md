@@ -11,9 +11,10 @@ branding; it simply displays chatgpt.com under your own login.
 ## Install (from a release)
 
 1. Download the `.dmg` (or `.zip`) from the repo's Releases page.
-2. Drag `CatGPT.app` to `/Applications` (or anywhere).
-3. Open it. Releases are Developer-ID signed and notarized, so Gatekeeper
-   opens them without ceremony.
+2. Open the DMG and drag `CatGPT` onto the `Applications` alias sitting next
+   to it (a copy of this README rides along in the DMG as a PDF).
+3. Open it. Releases are Developer-ID signed and notarized — both the app and
+   the DMG — so Gatekeeper opens them without ceremony.
 
 ## Logging in — READ THIS, it's not obvious
 

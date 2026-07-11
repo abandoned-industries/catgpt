@@ -55,19 +55,41 @@ EOF
   xcrun stapler validate "$APP"
 fi
 
-echo "==> Building release artifacts"
+echo "==> Building README.pdf"
 mkdir -p "$RELDIR"
+PDF="$RELDIR/CatGPT-README.pdf"
+pandoc README.md -f gfm -s -o "$PDF" --pdf-engine=weasyprint \
+  --metadata title="CatGPT" --metadata pagetitle="CatGPT"
+
+echo "==> Building release artifacts"
 ZIP="$RELDIR/CatGPT-$VERSION-arm64.zip"
 DMG="$RELDIR/CatGPT-$VERSION-arm64.dmg"
 rm -f "$ZIP" "$DMG"
 ditto -c -k --keepParent "$APP" "$ZIP"
-hdiutil create -volname "CatGPT" -srcfolder "$APP" -ov -format UDZO "$DMG" >/dev/null
+
+# Installer-style DMG: app + /Applications alias + README.pdf (the layout
+# every macOS user knows — drag the app onto the alias).
+STAGE="$(mktemp -d)"
+trap 'rm -rf "$STAGE"' EXIT
+cp -R "$APP" "$STAGE/"
+ln -s /Applications "$STAGE/Applications"
+cp "$PDF" "$STAGE/README.pdf"
+hdiutil create -volname "CatGPT" -srcfolder "$STAGE" -ov -format UDZO "$DMG" >/dev/null
+
+IDENTITY="Developer ID Application: Kazys Varnelis (PHCL25Z99X)"
+codesign --force --sign "$IDENTITY" "$DMG"
+if [[ "$SKIP_NOTARIZE" != "--skip-notarize" ]]; then
+  echo "==> Notarizing DMG"
+  xcrun notarytool submit "$DMG" --keychain-profile "$PROFILE" --wait
+  xcrun stapler staple "$DMG"
+fi
 echo "    $ZIP"
 echo "    $DMG"
+echo "    $PDF"
 
 echo "==> Creating GitHub release v$VERSION"
-gh release create "v$VERSION" "$DMG" "$ZIP" \
+gh release create "v$VERSION" "$DMG" "$ZIP" "$PDF" \
   --title "CatGPT $VERSION" \
-  --notes "Signed and notarized macOS build (Apple Silicon). See README for install and the login guide (passkeys don't work in-app — use \"Try another way\")."
+  --notes "Signed and notarized macOS build (Apple Silicon), app and DMG both stapled. Open the DMG and drag CatGPT onto the Applications alias. See the bundled README (also attached as PDF) for the login guide — passkeys don't work in-app; use \"Try another way\"."
 
 echo "==> Done: $(gh release view "v$VERSION" --json url -q .url)"
