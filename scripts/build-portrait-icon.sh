@@ -19,15 +19,23 @@ mkdir -p "$WORK"
 # 1. Cut the cat out of the baked checkerboard background (real alpha).
 xcrun swift "$ROOT/scripts/subject-lift.swift" "$SRC" "$WORK/cat-cutout.png"
 
-# 2. Ochre gradient tile, Big Sur geometry (824px tile, r=185, on 1024 canvas).
-magick -size 824x1200 "gradient:#E5A873-#CE8B52" \
-  \( -size 824x824 xc:none -fill white -draw "roundrectangle 0,0 823,823 185,185" \) \
-  -gravity north -compose CopyOpacity -composite -crop 824x824+0+0 "$WORK/tile824.png"
+# 2. Ochre gradient tile, FULL-CANVAS (1024px, r=230 ≈ Apple's squircle ratio).
+# macOS 26 wraps under-filled icons in a gray backplate; a full-bleed rounded
+# tile avoids the frame there and still shows proper corners on macOS 14-15.
+magick -size 1024x1500 "gradient:#E5A873-#CE8B52" \
+  \( -size 1024x1024 xc:none -fill white -draw "roundrectangle 0,0 1023,1023 230,230" \) \
+  -gravity north -compose CopyOpacity -composite -crop 1024x1024+0+0 "$WORK/tile1024.png"
 
-# 3. Treatment A: floating portrait — cat 640px tall, bottom flush with tile.
-magick "$WORK/cat-cutout.png" -resize x640 "$WORK/cat-a.png"
-magick -size 1024x1024 xc:none "$WORK/tile824.png" -geometry +100+100 -composite \
-  "$WORK/cat-a.png" -gravity south -geometry +0+101 -composite "$WORK/icon-1024.png"
+# 3. Portrait: cat 900px tall, bottom flush. A soft shadow rises from the
+# bottom so the wide flanks blend into the corner curves instead of being
+# sliced by them; then clip everything to the rounded tile.
+magick "$WORK/cat-cutout.png" -resize x900 "$WORK/cat-a.png"
+magick -size 1024x260 "gradient:none-rgba(30,15,4,0.55)" "$WORK/shade.png"
+magick "$WORK/tile1024.png" \
+  "$WORK/cat-a.png" -gravity south -geometry +0+0 -composite \
+  "$WORK/shade.png" -gravity south -geometry +0+0 -composite \
+  \( -size 1024x1024 xc:black -fill white -draw "roundrectangle 0,0 1023,1023 230,230" \) \
+  -alpha off -compose CopyOpacity -composite "$WORK/icon-1024.png"
 
 # 4. Iconset at every required size, then icns.
 rm -rf "$ICONSET"

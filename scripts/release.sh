@@ -87,9 +87,14 @@ echo "    $ZIP"
 echo "    $DMG"
 echo "    $PDF"
 
-echo "==> Creating GitHub release v$VERSION"
-gh release create "v$VERSION" "$DMG" "$ZIP" "$PDF" \
-  --title "CatGPT $VERSION" \
-  --notes "Signed and notarized macOS build (Apple Silicon), app and DMG both stapled. Open the DMG and drag CatGPT onto the Applications alias. See the bundled README (also attached as PDF) for the login guide — passkeys don't work in-app; use \"Try another way\"."
+if gh release view "v$VERSION" >/dev/null 2>&1; then
+  echo "==> Release v$VERSION exists — refreshing assets in place"
+  gh release upload "v$VERSION" "$DMG" "$ZIP" "$PDF" --clobber
+else
+  echo "==> Creating GitHub release v$VERSION"
+  gh release create "v$VERSION" "$DMG" "$ZIP" "$PDF" \
+    --title "CatGPT $VERSION" \
+    --notes "Signed and notarized macOS build (Apple Silicon), app and DMG both stapled. Open the DMG and drag CatGPT onto the Applications alias. See the bundled README (also attached as PDF) for the login guide — passkeys don't work in-app; use \"Try another way\"."
+fi
 
 echo "==> Done: $(gh release view "v$VERSION" --json url -q .url)"
