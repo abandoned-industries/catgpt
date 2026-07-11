@@ -25,9 +25,13 @@ npm run package < <(sleep 900)
 
 echo "==> Verifying signature"
 codesign --verify --deep --strict "$APP"
-codesign -dv "$APP" 2>&1 | grep -q "TeamIdentifier=PHCL25Z99X" || {
-  echo "error: app is not Developer ID signed" >&2; exit 1;
-}
+# Capture first: pipefail + grep -q races SIGPIPE against codesign's exit.
+SIGNATURE_INFO="$(codesign -dv "$APP" 2>&1)"
+if ! grep -q "TeamIdentifier=PHCL25Z99X" <<<"$SIGNATURE_INFO"; then
+  echo "error: app is not Developer ID signed:" >&2
+  echo "$SIGNATURE_INFO" >&2
+  exit 1
+fi
 
 if [[ "$SKIP_NOTARIZE" == "--skip-notarize" ]]; then
   echo "WARNING: skipping notarization — downloaded copies will hit Gatekeeper" >&2
