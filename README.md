@@ -93,8 +93,8 @@ Notes:
   postPackage hook (`forge.config.ts`) — building on another machine means
   changing the identity there, or removing the hook (unsigned builds run
   locally but macOS will not grant them the microphone reliably).
-- Releasing requires a one-time `xcrun notarytool store-credentials
-  "catgpt-notary" ...` (see `scripts/release.sh`).
+- Releasing notarizes via the machine-wide `notary` keychain profile (see
+  `scripts/release.sh` for fresh-machine setup).
 - Node ≥24.16/26 zip bug in the Electron toolchain is already worked around
   via the `overrides` pin in `package.json` — don't remove it until Forge ≥8.
 - Icon: regenerate from the portrait source with

@@ -7,8 +7,9 @@
 - **Notarization decision reversed for released artifacts** (was: sign-only).
   GitHub downloads carry the quarantine flag and modern Gatekeeper removed the
   right-click bypass, so releases must be notarized. Local builds stay fine
-  unnotarized. Credentials: notarytool keychain profile `catgpt-notary`,
-  owner-created from an app-specific password — never stored in the repo.
+  unnotarized. Credentials: the machine-wide notarytool keychain profile
+  `notary` (predates this project; shared across all of Kazys's apps) — the
+  app-specific password lives only in the keychain, never in the repo.
 - Release artifacts come from `scripts/release.sh` (package → notarize →
   staple → ditto zip + hdiutil dmg → `gh release create`). Forge makers are
   NOT used for macOS releases — notarization has to happen between packaging

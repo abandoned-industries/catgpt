@@ -4,13 +4,13 @@
 #   ./scripts/release.sh                # full run: package -> notarize -> staple -> zip+dmg -> gh release
 #   ./scripts/release.sh --skip-notarize  # escape hatch: unnotarized artifacts (Gatekeeper will fight users)
 #
-# One-time setup for notarization (owner, interactive — password never in repo
-# or shell history; omit --password to be prompted):
-#   xcrun notarytool store-credentials "catgpt-notary" \
-#     --apple-id <your-apple-developer-account-email> --team-id PHCL25Z99X
+# Notarization uses the MACHINE-WIDE keychain profile "notary" (shared by all
+# of Kazys's projects; created once, verified working 2026-07-10). Only on a
+# fresh machine: xcrun notarytool store-credentials "notary" \
+#   --apple-id kvarnelis@gmail.com --team-id PHCL25Z99X   (interactive password)
 set -euo pipefail
 
-PROFILE="catgpt-notary"
+PROFILE="${NOTARY_PROFILE:-notary}"
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
 
