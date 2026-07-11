@@ -1,0 +1,103 @@
+:root {
+  /* Owner-picked: the splash is always light, regardless of system theme. */
+  color-scheme: only light;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", sans-serif;
+  color: #202123;
+  background: #f7f7f8;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  min-height: 100%;
+  margin: 0;
+}
+
+body {
+  display: grid;
+  place-items: center;
+  padding: 42px 44px 34px;
+}
+
+main {
+  width: 100%;
+  text-align: center;
+}
+
+.app-icon {
+  display: block;
+  width: 108px;
+  height: 108px;
+  margin: 0 auto 12px;
+  object-fit: contain;
+}
+
+h1 {
+  margin: 0;
+  font-size: 34px;
+  letter-spacing: -0.8px;
+}
+
+.subtitle {
+  margin: 3px 0 22px;
+  color: #6e6e80;
+  font-size: 14px;
+}
+
+.disclaimer {
+  margin: 0 auto 20px;
+  max-width: 440px;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+section {
+  padding: 17px 20px 14px;
+  border: 1px solid #e3e3e8;
+  border-radius: 12px;
+  background: #ffffff;
+  text-align: left;
+}
+
+h2 {
+  margin: 0 0 10px;
+  font-size: 15px;
+}
+
+ol {
+  margin: 0;
+  padding-left: 22px;
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+li + li {
+  margin-top: 7px;
+}
+
+button {
+  width: 100%;
+  margin-top: 22px;
+  padding: 11px 18px;
+  border: 0;
+  border-radius: 9px;
+  color: #fff;
+  background: #10a37f;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #0d8a6c;
+}
+
+button:focus-visible {
+  outline: 3px solid rgb(16 163 127 / 35%);
+  outline-offset: 2px;
+}
+

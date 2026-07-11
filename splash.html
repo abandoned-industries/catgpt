@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to CatGPT</title>
+    <link rel="stylesheet" href="/src/splash.css" />
+  </head>
+  <body>
+    <main>
+      <img class="app-icon" src="/assets/splash-icon.png" alt="CatGPT icon" />
+      <h1>CatGPT</h1>
+      <p class="subtitle">Unofficial ChatGPT desktop wrapper</p>
+
+      <p class="disclaimer">
+        Unofficial desktop wrapper for ChatGPT.com. Not affiliated with, endorsed
+        by, or sponsored by OpenAI.
+      </p>
+
+      <section aria-labelledby="before-login-heading">
+        <h2 id="before-login-heading">Before you log in</h2>
+        <ol>
+          <li>Choose <q>Continue with Google</q>.</li>
+          <li>
+            If Google shows <q>Use your passkey</q>, do <strong>NOT</strong> press
+            Continue — passkeys cannot work inside this app.
+          </li>
+          <li>
+            Click <q>Try another way</q> and use a phone prompt, authenticator
+            code, or SMS instead.
+          </li>
+          <li>This is one-time; your session persists across restarts.</li>
+        </ol>
+      </section>
+
+      <button type="button" onclick="window.close()">Got it</button>
+    </main>
+  </body>
+</html>

@@ -1,0 +1,50 @@
+{
+  "fill" : {
+    "automatic-gradient" : "extended-srgb:0.00000,0.53333,1.00000,1.00000"
+  },
+  "groups" : [
+    {
+      "layers" : [
+        {
+          "blend-mode" : "normal",
+          "glass" : false,
+          "image-name" : "icon-layer-cat.png",
+          "name" : "icon-layer-cat",
+          "position" : {
+            "scale" : 1.8,
+            "translation-in-points" : [
+              16.199999999999932,
+              -21.767187499999864
+            ]
+          }
+        },
+        {
+          "glass" : false,
+          "image-name" : "icon-layer-tile.png",
+          "name" : "icon-layer-tile",
+          "position" : {
+            "scale" : 1,
+            "translation-in-points" : [
+              -9,
+              -11.3671875
+            ]
+          }
+        }
+      ],
+      "shadow" : {
+        "kind" : "neutral",
+        "opacity" : 0.5
+      },
+      "translucency" : {
+        "enabled" : true,
+        "value" : 0.5
+      }
+    }
+  ],
+  "supported-platforms" : {
+    "circles" : [
+      "watchOS"
+    ],
+    "squares" : "shared"
+  }
+}

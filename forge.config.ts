@@ -17,6 +17,7 @@ const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
     icon: './assets/CatGPT',
+    extraResource: ['./assets/about-ajman.png'],
     appBundleId: 'net.varnelis.catgpt',
     extendInfo: {
       NSMicrophoneUsageDescription:

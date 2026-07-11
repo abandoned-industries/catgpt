@@ -1,11 +1,13 @@
 import { Menu, app, type BrowserWindow } from 'electron';
 
+import { configureAboutPanel } from './about';
 import { attachDownloadHandling } from './downloads';
 import { registerGlobalHotkey, unregisterGlobalHotkey } from './hotkey';
 import { buildApplicationMenu } from './menu';
 import { attachNavigationPolicy } from './navigation';
 import { configurePermissions } from './permissions';
 import { configureAppSession } from './session';
+import { showSplashIfNeeded } from './splash';
 import { createMainWindow, type MainWindowHandle } from './window';
 
 let mainWindow: MainWindowHandle | undefined;
@@ -82,12 +84,18 @@ if (!gotSingleInstanceLock) {
   });
 
   app.on('ready', () => {
+    configureAboutPanel();
     const appSession = configureAppSession();
     configurePermissions(appSession);
     attachDownloadHandling(appSession, resolveMainWindow);
     buildApplicationMenu(resolveMainWindow);
     registeredHotkey = registerGlobalHotkey(resolveMainWindow);
-    createAndTrackMainWindow();
+    const handle = createAndTrackMainWindow();
+    void showSplashIfNeeded(appSession, handle.window).catch((error: unknown) => {
+      if (!app.isPackaged) {
+        console.warn('[splash] Failed to determine login state', error);
+      }
+    });
 
     // Dock menu as a recovery path that never depends on event timing.
     app.dock?.setMenu(
