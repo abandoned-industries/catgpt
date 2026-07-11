@@ -1,4 +1,5 @@
 import { execFileSync } from 'node:child_process';
+import { copyFileSync, mkdirSync } from 'node:fs';
 import path from 'node:path';
 
 import type { ForgeConfig } from '@electron-forge/shared-types';
@@ -20,6 +21,7 @@ const config: ForgeConfig = {
     extraResource: ['./assets/about-ajman.png'],
     appBundleId: 'net.varnelis.catgpt',
     extendInfo: {
+      CFBundleIconName: 'CatGPT',
       NSMicrophoneUsageDescription:
         'CatGPT needs the microphone for ChatGPT voice mode.',
     },
@@ -38,9 +40,37 @@ const config: ForgeConfig = {
       }
 
       const appPath = path.join(outputPaths[0], 'CatGPT.app');
+      const nativeIconOutputPath = path.resolve(
+        process.cwd(),
+        'out/icon-native',
+      );
       const signer = path.resolve(
         process.cwd(),
         'node_modules/.bin/electron-osx-sign',
+      );
+
+      mkdirSync(nativeIconOutputPath, { recursive: true });
+      execFileSync(
+        'xcrun',
+        [
+          'actool',
+          'assets/CatGPT.icon',
+          '--compile',
+          nativeIconOutputPath,
+          '--platform',
+          'macosx',
+          '--minimum-deployment-target',
+          '15.0',
+          '--app-icon',
+          'CatGPT',
+          '--output-partial-info-plist',
+          path.join(nativeIconOutputPath, 'partial.plist'),
+        ],
+        { stdio: 'inherit' },
+      );
+      copyFileSync(
+        path.join(nativeIconOutputPath, 'Assets.car'),
+        path.join(appPath, 'Contents/Resources/Assets.car'),
       );
 
       execFileSync(
