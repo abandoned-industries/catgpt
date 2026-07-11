@@ -1,5 +1,19 @@
 # Decisions log
 
+## Release v0.1.0 (2026-07-10, owner-directed)
+
+- Phase order amended by owner: release pipeline (Phase 4 scope) built before
+  Phase 3. Phase 3 remains queued behind the rest of Gate 2.
+- **Notarization decision reversed for released artifacts** (was: sign-only).
+  GitHub downloads carry the quarantine flag and modern Gatekeeper removed the
+  right-click bypass, so releases must be notarized. Local builds stay fine
+  unnotarized. Credentials: notarytool keychain profile `catgpt-notary`,
+  owner-created from an app-specific password — never stored in the repo.
+- Release artifacts come from `scripts/release.sh` (package → notarize →
+  staple → ditto zip + hdiutil dmg → `gh release create`). Forge makers are
+  NOT used for macOS releases — notarization has to happen between packaging
+  and artifact creation, which the maker flow doesn't accommodate cleanly.
+
 ## Phase 2 (2026-07-10)
 
 - **Icon final: raster portrait, treatment A** (owner-picked). Owner generated a
