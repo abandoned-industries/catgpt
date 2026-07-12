@@ -2,6 +2,15 @@ import { app, systemPreferences, type Session } from 'electron';
 
 const CHATGPT_ORIGIN = 'https://chatgpt.com';
 
+// Non-media permissions granted to chatgpt.com: web notifications, and the
+// sanitized clipboard write behind ChatGPT's "copy" buttons
+// (navigator.clipboard.writeText). clipboard-read stays denied — copy needs
+// only write, and reading the OS clipboard is a privacy concern we don't need.
+const SIMPLE_ALLOWED_PERMISSIONS = new Set([
+  'notifications',
+  'clipboard-sanitized-write',
+]);
+
 // Electron-level permission is not enough for audio capture: macOS TCC must
 // also grant the microphone to this app. 'not-determined' → trigger the system
 // prompt; 'denied'/'restricted' → capture yields silence, so refuse and log.
@@ -55,7 +64,7 @@ export const configurePermissions = (appSession: Session): void => {
         mediaTypes.every((mediaType) => mediaType === 'audio');
       const allowed =
         isAllowedOrigin(origin) &&
-        (permission === 'notifications' ||
+        (SIMPLE_ALLOWED_PERMISSIONS.has(permission) ||
           (permission === 'media' && audioOnly));
 
       if (!allowed) {
@@ -88,7 +97,7 @@ export const configurePermissions = (appSession: Session): void => {
       // an explicit 'video' check is refused.
       const allowed =
         isAllowedOrigin(origin) &&
-        (permission === 'notifications' ||
+        (SIMPLE_ALLOWED_PERMISSIONS.has(permission) ||
           (permission === 'media' && details.mediaType !== 'video'));
 
       if (!allowed) {

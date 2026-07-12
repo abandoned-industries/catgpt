@@ -175,6 +175,20 @@ export const createMainWindow = (): MainWindowHandle => {
     }
   };
 
+  // The window hosts its own 28px drag-strip webContents next to the chatgpt
+  // view. Without this, that strip keeps focus and the view's document reports
+  // unfocused — which makes Chromium's async clipboard API reject with
+  // "Document is not focused", breaking ChatGPT's copy buttons. Keep the
+  // chatgpt view as the focused web contents whenever the app is active.
+  const focusChatView = (): void => {
+    if (!view.webContents.isDestroyed()) {
+      view.webContents.focus();
+    }
+  };
+
+  view.webContents.on('did-finish-load', focusChatView);
+  window.on('focus', focusChatView);
+
   void view.webContents.loadURL('https://chatgpt.com');
 
   return { window, view, persistState };
