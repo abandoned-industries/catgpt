@@ -97,6 +97,16 @@ const config: ForgeConfig = {
         ],
         { stdio: 'inherit' },
       );
+
+      // electron-packager freezes the .app mtime to a fixed 1979 epoch for
+      // reproducible builds — but macOS keys its icon cache on mtime, so
+      // in-place rebuilds keep showing the stale dock icon. Bump the mtime
+      // (after signing; it is not part of the signature) so IconServices
+      // notices the change. Harmless for distributed copies, which get a
+      // fresh mtime on the downloader's disk regardless.
+      execFileSync('touch', [appPath, path.join(appPath, 'Contents/Info.plist')], {
+        stdio: 'inherit',
+      });
     },
   },
   rebuildConfig: {},

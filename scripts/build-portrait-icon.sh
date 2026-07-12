@@ -27,13 +27,22 @@ magick -size 1024x1500 "gradient:#E5A873-#CE8B52" \
   -gravity north -compose CopyOpacity -composite -crop 1024x1024+0+0 "$WORK/tile1024.png"
 
 # 3. Portrait: cat 900px tall, bottom flush. A soft shadow rises from the
-# bottom so the wide flanks blend into the corner curves instead of being
-# sliced by them; then clip everything to the rounded tile.
+# bottom by fading the cat's own alpha to transparent over the last 150px, so
+# the cat dissolves into the ochre tile (no dark shade, no hard crop line);
+# then clip everything to the rounded tile.
 magick "$WORK/cat-cutout.png" -resize x900 "$WORK/cat-a.png"
-magick -size 1024x260 "gradient:none-rgba(30,15,4,0.55)" "$WORK/shade.png"
+CAT_DIMS=$(magick identify -format "%wx%h" "$WORK/cat-a.png")
+CAT_W=${CAT_DIMS%x*}
+CAT_H=${CAT_DIMS#*x}
+magick -size "${CAT_W}x$((CAT_H - 150))" xc:white \
+  \( -size "${CAT_W}x150" gradient:white-black \) -append "$WORK/fade-mask.png"
+magick "$WORK/cat-a.png" -alpha extract "$WORK/cat-alpha.png"
+magick "$WORK/cat-alpha.png" "$WORK/fade-mask.png" -compose Multiply -composite \
+  "$WORK/cat-alpha-faded.png"
+magick "$WORK/cat-a.png" "$WORK/cat-alpha-faded.png" \
+  -alpha off -compose CopyOpacity -composite "$WORK/cat-faded.png"
 magick "$WORK/tile1024.png" \
-  "$WORK/cat-a.png" -gravity south -geometry +0+0 -composite \
-  "$WORK/shade.png" -gravity south -geometry +0+0 -composite \
+  "$WORK/cat-faded.png" -gravity south -geometry +0+0 -composite \
   \( -size 1024x1024 xc:black -fill white -draw "roundrectangle 0,0 1023,1023 230,230" \) \
   -alpha off -compose CopyOpacity -composite "$WORK/icon-1024.png"
 
