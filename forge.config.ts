@@ -73,6 +73,19 @@ const config: ForgeConfig = {
         path.join(appPath, 'Contents/Resources/Assets.car'),
       );
 
+      // electron-packager 18.4 writes its own CFBundleIconName ("Icon",
+      // matching Electron's stock Assets.car) and it wins over extendInfo —
+      // force ours so macOS 26 finds the CatGPT icon group in our car.
+      execFileSync(
+        '/usr/libexec/PlistBuddy',
+        [
+          '-c',
+          'Set :CFBundleIconName CatGPT',
+          path.join(appPath, 'Contents/Info.plist'),
+        ],
+        { stdio: 'inherit' },
+      );
+
       execFileSync(
         signer,
         [
